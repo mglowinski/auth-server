@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private String userName;
+    private String username;
     private String password;
     private boolean isActive;
     private List<GrantedAuthority> authorities;
 
     public UserDetailsImpl(User user) {
-        this.userName = user.getUserName();
+        this.username = user.getUsername();
         this.password = user.getPassword();
         this.isActive = user.isActive();
         this.authorities = user.getRoles()
@@ -37,7 +37,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return username;
     }
 
     @Override

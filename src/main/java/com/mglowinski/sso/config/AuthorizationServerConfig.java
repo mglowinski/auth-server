@@ -15,29 +15,20 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    private static final String CLIENT_ID = "client";
-    private static final String CLIENT_SECRET = "{noop}secret";
-    private static final String GRANT_TYPE_PASSWORD = "password";
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CLIENT_CREDENTIALS = "client_credentials";
-    private static final String REFRESH_TOKEN = "refresh_token";
-    private static final String IMPLICIT = "implicit";
-    private static final String SCOPE_READ = "read";
-    private static final String SCOPE_WRITE = "write";
-    private static final String REDIRECT_URI = "http://localhost:8080/redirect";
-    private static final int ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60;
-    private static final int REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
-
+    private final DataSource dataSource;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthorizationServerConfig(AuthenticationManager authenticationManager) {
+    public AuthorizationServerConfig(DataSource dataSource,
+                                     AuthenticationManager authenticationManager) {
+        this.dataSource = dataSource;
         this.authenticationManager = authenticationManager;
     }
 
@@ -54,15 +45,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient(CLIENT_ID)
-                .secret(CLIENT_SECRET)
-                .scopes(SCOPE_READ, SCOPE_WRITE)
-                .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, CLIENT_CREDENTIALS,
-                        IMPLICIT, REFRESH_TOKEN)
-                .redirectUris(REDIRECT_URI)
-                .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
-                .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
+        clients.jdbc(dataSource);
     }
 
     @Override
